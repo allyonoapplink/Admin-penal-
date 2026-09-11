@@ -51,18 +51,32 @@
     padding:4px 8px;font-size:12px;font-weight:700;
   }
   .toggle-token{font-size:12px;color:var(--blue);cursor:pointer;margin-top:6px;display:inline-block;}
+  .brand-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 2px 14px 2px;margin-bottom:6px;border-bottom:1px solid var(--border);}
+  .brand-left{font-weight:800;font-size:15px;color:var(--text);}
+  .brand-right{font-size:11.5px;font-weight:600;color:var(--text2);}
+  .token-row{display:flex;gap:8px;align-items:stretch;}
+  .token-row input{flex:1;}
+  .token-btn{width:auto;flex-shrink:0;margin-top:0;padding:0 16px;font-size:13px;}
+  .token-btn-save{background:var(--green);}
+  .token-btn-edit{background:#6b7280;}
 </style>
 </head>
 <body>
-<div id="passwordGate" class="password-gate"><div class="gate-inner"><div class="gate-brand"><span>Yono Games • A to Z • All Website</span><span>Admin Control • Baharul Credit</span></div><div class="gate-card"><h1>Admin Control</h1><p>Enter your admin password to unlock all website controls.</p><label for="adminPassword">Enter Your Password Name</label><div class="pw-wrap"><input id="adminPassword" type="password" inputmode="numeric" maxlength="10" autocomplete="off" placeholder="Enter your password name"><button type="button" id="passwordToggle">Show</button></div><button type="button" id="unlockBtn" class="unlock">Unlock Admin</button><div id="gateStatus"></div><div id="unlockAnimation"><div id="unlockLoader"></div><strong id="unlockText">Checking admin access…</strong></div><div class="atomic"><b>Atomic Security</b><br>Four incorrect attempts trigger a 1-minute limit timer. Password stays hidden while typing.</div></div></div></div>
-<div id="adminProtectedContent" style="display:none">
-<style>
-:root{--bg:#050505;--card:#0d0d0d;--text:#fff;--text2:#aaa;--border:#2b2b2b;--blue:#fff;--blue-dark:#ddd;--red:#ff3b30;--green:#42e695}
-html,body{background:#050505!important;color:#fff!important} body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
-.admin-top{position:sticky;top:0;z-index:20;background:#050505;border-bottom:1px solid #292929;padding:12px 14px}.admin-top-line{display:flex;justify-content:space-between;gap:10px;font-size:10px;font-weight:900;white-space:nowrap;overflow:hidden}.admin-top-line span{overflow:hidden;text-overflow:ellipsis}.card{background:#0d0d0d!important;border-color:#2b2b2b!important}.card input,.card input[type=text],.card input[type=password],.card input[type=url]{background:#050505!important;color:#fff!important;border-color:#333!important}.card button{background:#fff!important;color:#050505!important}.password-gate{min-height:100vh;background:#050505;color:#fff;display:flex;justify-content:center;padding:0 14px}.gate-inner{width:100%;max-width:420px;padding:20px 0 40px}.gate-brand{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid #292929;padding:0 2px 15px;font-size:10px;font-weight:900;white-space:nowrap}.gate-brand span{overflow:hidden;text-overflow:ellipsis}.gate-card{margin-top:22px;background:#0d0d0d;border:1px solid #2c2c2c;border-radius:22px;padding:20px;box-shadow:0 16px 45px #0008}.gate-card h1{font-size:23px;margin:0 0 6px;font-weight:900}.gate-card p{font-size:12px;color:#999;margin:0 0 18px}.gate-card label{display:block;font-size:12px;font-weight:900;margin:0 0 7px}.pw-wrap{position:relative}.pw-wrap input{width:100%;height:45px;box-sizing:border-box;padding:10px 65px 10px 12px;background:#050505;color:#fff;border:1px solid #333;border-radius:12px;font-size:16px;letter-spacing:2px}.pw-wrap button{position:absolute;right:7px;top:6px;width:auto;margin:0;padding:7px 9px;border-radius:9px;background:#191919;color:#fff;border:1px solid #333;font-size:11px}.unlock{width:100%;height:45px;margin-top:12px;border:0;border-radius:12px;background:#fff;color:#050505;font-weight:900;font-size:14px}.gate-status{display:none;margin-top:12px;padding:11px 12px;border-radius:11px;font-size:12px;line-height:1.45;font-weight:700}.gate-status.show{display:block}.gate-status.error{background:#3a1111;color:#ff8e88;border:1px solid #792522}.gate-status.locked{background:#211c0b;color:#ffe58a;border:1px solid #6b5a1e}.gate-status.success{background:#12351f;color:#7dffad;border:1px solid #1d6b3a}.gate-status.info{background:#171717;color:#ddd;border:1px solid #333}#unlockAnimation{display:none;text-align:center;padding:25px 8px 2px}#unlockLoader{width:42px;height:42px;border:3px solid #333;border-top-color:#fff;border-radius:50%;margin:0 auto 12px;animation:adminSpin .8s linear infinite}@keyframes adminSpin{to{transform:rotate(360deg)}}.atomic{margin-top:15px;padding:11px 12px;border:1px solid #282828;border-radius:12px;background:#080808;color:#aaa;font-size:10.5px;line-height:1.5}.atomic b{color:#fff}
-</style>
+<div class="wrap">
+  <div class="brand-row">
+    <span class="brand-left">YONO GAMES A to Z</span>
+    <span class="brand-right">Admin · Baharul</span>
+  </div>
 
-<div class="admin-top"><div class="admin-top-line"><span>Yono Games • A to Z • All Website</span><span>Admin Control • Baharul Credit</span></div></div><div class="wrap">
+  <div class="card" id="lockCard">
+    <h2>Enter your passcode</h2>
+    <label>Passcode</label>
+    <input type="password" id="passcodeInput" placeholder="Enter your passcode" inputmode="numeric">
+    <button id="unlockBtn">Unlock</button>
+    <div class="status" id="lockStatus"></div>
+  </div>
+
+  <div id="mainPanel" style="display:none;">
   <h1>Admin Panel</h1>
   <p class="sub">Add a new app to your directory. New entries are saved directly to <code>apps.json</code> in your GitHub repo — your live site picks them up automatically.</p>
 
@@ -79,8 +93,12 @@ html,body{background:#050505!important;color:#fff!important} body{font-family:-a
     <label>Personal Access Token
       <span class="toggle-token" id="tokenToggle">show</span>
     </label>
-    <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx">
-    <p class="hint">Create one at github.com → Settings → Developer settings → Personal access tokens (fine-grained, with "Contents: Read and write" permission on this repo only). This token is stored only in your browser's local storage on this device — it is never sent anywhere except directly to GitHub's own API.</p>
+    <div class="token-row">
+      <input type="password" id="ghToken" placeholder="ghp_xxxxxxxxxxxx">
+      <button type="button" id="tokenSaveBtn" class="token-btn token-btn-save">Save</button>
+      <button type="button" id="tokenEditBtn" class="token-btn token-btn-edit" style="display:none;">Edit</button>
+    </div>
+    <p class="hint">Create one at github.com → Settings → Developer settings → Personal access tokens (fine-grained, with "Contents: Read and write" permission on this repo only). This token is stored only in your browser's local storage on this device — it is never sent anywhere except directly to GitHub's own API. Click <strong>Save</strong> to lock it in place, and <strong>Edit</strong> whenever you need to change it.</p>
     <button id="loadBtn">Load Current Apps</button>
     <div class="status" id="loadStatus"></div>
   </div>
@@ -102,15 +120,91 @@ html,body{background:#050505!important;color:#fff!important} body{font-family:-a
     <h2>Current Apps (<span id="countLabel">0</span>)</h2>
     <div class="list" id="appList"></div>
   </div>
+  </div>
 </div>
 
-<script>
-(()=>{const P="9127086380",MAX=4,LOCK=60000,g=document.getElementById("passwordGate"),a=document.getElementById("adminProtectedContent"),i=document.getElementById("adminPassword"),u=document.getElementById("unlockBtn"),t=document.getElementById("passwordToggle"),s=document.getElementById("gateStatus"),an=document.getElementById("unlockAnimation"),ld=document.getElementById("unlockLoader"),tx=document.getElementById("unlockText");let tries=Number(sessionStorage.getItem("admin_tries")||0),until=Number(sessionStorage.getItem("admin_lock")||0),tm;function st(m,c){s.textContent=m;s.className="gate-status show "+c}function locked(){return Date.now()<until}function tick(){if(!locked()){clearInterval(tm);u.disabled=false;if(until){until=0;tries=0;sessionStorage.removeItem("admin_lock");sessionStorage.removeItem("admin_tries");st("Limit finished. You can try the admin password again.","info")}return}u.disabled=true;st("Password limit reached. Please wait "+Math.ceil((until-Date.now())/1000)+" seconds before trying again.","locked")}function lock(){until=Date.now()+LOCK;sessionStorage.setItem("admin_lock",until);sessionStorage.setItem("admin_tries",MAX);tick();clearInterval(tm);tm=setInterval(tick,250)}t.onclick=()=>{i.type=i.type==="password"?"text":"password";t.textContent=i.type==="password"?"Show":"Hide";i.focus()};function verify(){if(locked())return tick();let v=i.value.trim();if(!v)return st("Password is not entered. Please enter only admin password.","error");if(v!==P){tries++;sessionStorage.setItem("admin_tries",tries);i.value="";i.type="password";t.textContent="Show";if(tries>=MAX)return lock();let n=MAX-tries;return st("Password is not matched. Please enter only admin password. "+n+" attempt"+(n==1?"":"s")+" remaining.","error")}sessionStorage.removeItem("admin_tries");sessionStorage.removeItem("admin_lock");u.disabled=true;an.style.display="block";tx.textContent="Admin password verified. Unlocking all controls…";setTimeout(()=>{ld.style.display="none";tx.textContent="✓ Successful • All Admin Controls Unlocked";st("Successful. All admin controls are unlocked.","success")},650);setTimeout(()=>{g.style.display="none";a.style.display="block"},1100)}u.onclick=verify;i.onkeydown=e=>{if(e.key==="Enter")verify()};if(locked()){tick();tm=setInterval(tick,250)}})();
-</script>
 <script>
   const $ = id => document.getElementById(id);
   let currentList = [];
   let currentSha = null;
+
+  // ============================================================
+  // PASSCODE LOCK
+  // ------------------------------------------------------------
+  // IMPORTANT HONESTY NOTE (kept as a comment for anyone editing
+  // this file): this is a simple front-end speed-bump, not real
+  // security. Because this check runs in the browser, anyone who
+  // views this page's source code can see the correct passcode
+  // and the lockout logic. Do not rely on this alone to protect
+  // anything sensitive — the GitHub token itself (entered after
+  // unlocking) is the actual access control that matters.
+  // ============================================================
+  const ADMIN_PASSCODE = '9127086380';
+  const MAX_ATTEMPTS = 4;
+  const LOCKOUT_MS = 60000; // 1 minute
+
+  function getAttemptState() {
+    try {
+      return JSON.parse(localStorage.getItem('admin_lock_state') || '{}');
+    } catch (e) { return {}; }
+  }
+  function setAttemptState(state) {
+    localStorage.setItem('admin_lock_state', JSON.stringify(state));
+  }
+
+  function updateLockUI() {
+    const state = getAttemptState();
+    const now = Date.now();
+    if (state.lockedUntil && state.lockedUntil > now) {
+      const secsLeft = Math.ceil((state.lockedUntil - now) / 1000);
+      showStatus($('lockStatus'), `Too many wrong attempts. Try again in ${secsLeft}s.`, 'err');
+      $('unlockBtn').disabled = true;
+      $('passcodeInput').disabled = true;
+      setTimeout(updateLockUI, 1000);
+    } else {
+      $('unlockBtn').disabled = false;
+      $('passcodeInput').disabled = false;
+      if (state.lockedUntil && state.lockedUntil <= now) {
+        // lockout period just ended — reset attempt count
+        setAttemptState({ attempts: 0 });
+        $('lockStatus').className = 'status';
+      }
+    }
+  }
+
+  function tryUnlock() {
+    const state = getAttemptState();
+    const now = Date.now();
+    if (state.lockedUntil && state.lockedUntil > now) { updateLockUI(); return; }
+
+    const entered = $('passcodeInput').value.trim();
+    if (entered === ADMIN_PASSCODE) {
+      setAttemptState({ attempts: 0 });
+      sessionStorage.setItem('admin_unlocked', '1');
+      $('lockCard').style.display = 'none';
+      $('mainPanel').style.display = 'block';
+    } else {
+      const attempts = (state.attempts || 0) + 1;
+      if (attempts >= MAX_ATTEMPTS) {
+        setAttemptState({ attempts: 0, lockedUntil: now + LOCKOUT_MS });
+        updateLockUI();
+      } else {
+        setAttemptState({ attempts });
+        showStatus($('lockStatus'), `Passcode nahi hua — incorrect. (${MAX_ATTEMPTS - attempts} attempt${MAX_ATTEMPTS - attempts === 1 ? '' : 's'} left)`, 'err');
+      }
+    }
+    $('passcodeInput').value = '';
+  }
+
+  $('unlockBtn').addEventListener('click', tryUnlock);
+  $('passcodeInput').addEventListener('keydown', e => { if (e.key === 'Enter') tryUnlock(); });
+  updateLockUI();
+  // Stay unlocked for the rest of this browser tab session so a reload
+  // mid-edit doesn't force re-entering the passcode.
+  if (sessionStorage.getItem('admin_unlocked') === '1') {
+    $('lockCard').style.display = 'none';
+    $('mainPanel').style.display = 'block';
+  }
 
   // Auto-clean the username field: if someone pastes a full GitHub or
   // GitHub Pages URL instead of a plain username, extract just the
@@ -143,6 +237,27 @@ html,body{background:#050505!important;color:#fff!important} body{font-family:-a
   const savedToken = localStorage.getItem('admin_ghToken');
   if (savedToken) $('ghToken').value = savedToken;
   $('ghToken').addEventListener('change', () => localStorage.setItem('admin_ghToken', $('ghToken').value));
+
+  // Token Save/Edit lock: once saved, the field becomes read-only and
+  // "Save" is replaced by "Edit" — clicking Edit unlocks it again.
+  function lockTokenField() {
+    $('ghToken').disabled = true;
+    $('tokenSaveBtn').style.display = 'none';
+    $('tokenEditBtn').style.display = 'block';
+  }
+  function unlockTokenField() {
+    $('ghToken').disabled = false;
+    $('tokenSaveBtn').style.display = 'block';
+    $('tokenEditBtn').style.display = 'none';
+    $('ghToken').focus();
+  }
+  $('tokenSaveBtn').addEventListener('click', () => {
+    localStorage.setItem('admin_ghToken', $('ghToken').value);
+    lockTokenField();
+  });
+  $('tokenEditBtn').addEventListener('click', unlockTokenField);
+  // If a token was already saved from a previous visit, start locked.
+  if (savedToken) lockTokenField();
 
   $('tokenToggle').addEventListener('click', () => {
     const el = $('ghToken');
@@ -378,5 +493,5 @@ html,body{background:#050505!important;color:#fff!important} body{font-family:-a
   $('addBtn').addEventListener('click', addApp);
   $('cancelEditBtn').addEventListener('click', cancelEdit);
 </script>
-</div></body>
+</body>
 </html>
