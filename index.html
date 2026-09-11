@@ -50,6 +50,10 @@
     flex-shrink:0;background:none;border:none;color:var(--blue);width:auto;margin:0;
     padding:4px 8px;font-size:12px;font-weight:700;
   }
+  .list-row .recover{
+    flex-shrink:0;background:none;border:none;color:var(--green);width:auto;margin:0;
+    padding:4px 8px;font-size:12px;font-weight:700;
+  }
   .toggle-token{font-size:12px;color:var(--blue);cursor:pointer;margin-top:6px;display:inline-block;}
   .brand-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:4px 2px 14px 2px;margin-bottom:6px;border-bottom:1px solid var(--border);}
   .brand-left{font-weight:800;font-size:15px;color:var(--text);}
@@ -99,6 +103,7 @@
       <button type="button" id="tokenEditBtn" class="token-btn token-btn-edit" style="display:none;">Edit</button>
     </div>
     <p class="hint">Create one at github.com → Settings → Developer settings → Personal access tokens (fine-grained, with "Contents: Read and write" permission on this repo only). This token is stored only in your browser's local storage on this device — it is never sent anywhere except directly to GitHub's own API. Click <strong>Save</strong> to lock it in place, and <strong>Edit</strong> whenever you need to change it.</p>
+    <p class="hint"><strong>Your apps are always safe:</strong> the token here is only a temporary key that lets this admin panel talk to GitHub — it has no effect on your saved apps. If a token expires or is replaced, all 74+ apps already saved in <code>apps.json</code> stay exactly as they are. Connecting with a new token for the same repository simply continues managing that same, unchanged data.</p>
     <button id="loadBtn">Load Current Apps</button>
     <div class="status" id="loadStatus"></div>
   </div>
@@ -117,8 +122,14 @@
   </div>
 
   <div class="card" id="listCard" style="display:none;">
-    <h2>Current Apps (<span id="countLabel">0</span>)</h2>
+    <h2>Apps Live Now: <span id="countLabel">0</span></h2>
     <div class="list" id="appList"></div>
+  </div>
+
+  <div class="card" id="trashSection" style="display:none;">
+    <h2>Recently Removed</h2>
+    <p class="hint" style="margin-top:0;">Apps you've removed stay here until you recover them or clear this device's browser data — they are not shown on your live site, but nothing is lost.</p>
+    <div class="list" id="trashList"></div>
   </div>
   </div>
 </div>
@@ -312,6 +323,7 @@
       $('addCard').style.display = 'block';
       $('listCard').style.display = 'block';
       renderList();
+      renderTrash();
     } catch (e) {
       showStatus(statusEl, friendlyGitHubError(e.message), 'err');
     }
@@ -476,17 +488,73 @@
     return 'Failed to save: ' + msg;
   }
 
+  function trashKey() {
+    const owner = cleanOwnerInput($('ghOwner').value);
+    const repo = $('ghRepo').value.trim();
+    return `admin_trash_${owner}_${repo}`;
+  }
+  function getTrash() {
+    try { return JSON.parse(localStorage.getItem(trashKey()) || '[]'); } catch (e) { return []; }
+  }
+  function setTrash(list) {
+    localStorage.setItem(trashKey(), JSON.stringify(list));
+  }
+
   async function removeApp(id) {
-    if (!confirm('Remove this app from the directory?')) return;
-    const removed = currentList.find(a => a.id === id);
+    if (!confirm('Remove this app from the directory? You can recover it afterwards from "Recently Removed".')) return;
+    const idx = currentList.findIndex(a => a.id === id);
+    if (idx === -1) return;
+    const removed = currentList[idx];
     currentList = currentList.filter(a => a.id !== id);
     try {
-      await saveToGitHub(`Remove app: ${removed ? removed.name : id}`);
+      await saveToGitHub(`Remove app: ${removed.name}`);
+      const trash = getTrash();
+      trash.push({ app: removed, originalIndex: idx });
+      setTrash(trash);
       renderList();
+      renderTrash();
     } catch (e) {
-      alert('Failed to remove: ' + e.message);
-      loadApps(); // reload true state on failure
+      currentList.splice(idx, 0, removed); // roll back on failure
+      alert('Failed to remove: ' + friendlyGitHubError(e.message));
     }
+  }
+
+  async function recoverApp(id) {
+    const trash = getTrash();
+    const entryIdx = trash.findIndex(t => t.app.id === id);
+    if (entryIdx === -1) return;
+    const { app, originalIndex } = trash[entryIdx];
+    const insertAt = Math.min(originalIndex, currentList.length);
+    currentList.splice(insertAt, 0, app);
+    try {
+      await saveToGitHub(`Recover app: ${app.name}`);
+      trash.splice(entryIdx, 1);
+      setTrash(trash);
+      renderList();
+      renderTrash();
+    } catch (e) {
+      currentList.splice(insertAt, 1); // roll back on failure
+      alert('Failed to recover: ' + friendlyGitHubError(e.message));
+    }
+  }
+
+  function renderTrash() {
+    const trash = getTrash();
+    const section = $('trashSection');
+    const listEl = $('trashList');
+    if (!trash.length) { section.style.display = 'none'; return; }
+    section.style.display = 'block';
+    listEl.innerHTML = trash.map(t => `
+      <div class="list-row">
+        <img src="${t.app.image}" onerror="this.style.visibility='hidden'">
+        <span class="name">${t.app.name}</span>
+        <span class="id">#${t.app.id}</span>
+        <button class="recover" data-id="${t.app.id}">Recovery</button>
+      </div>
+    `).join('');
+    listEl.querySelectorAll('.recover').forEach(btn => {
+      btn.addEventListener('click', () => recoverApp(Number(btn.dataset.id)));
+    });
   }
 
   $('loadBtn').addEventListener('click', loadApps);
